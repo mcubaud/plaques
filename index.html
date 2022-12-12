@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang=fr dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="author" content="Martin Cubaud">
+    <meta http-equiv=“Content-Security-Policy” content=“default-src ‘self’ gap://ready file://* *; style-src ‘self’ ‘unsafe-inline’; script-src ‘self’ ‘unsafe-inline’ ‘unsafe-eval’”/>
+    <title>Plaques</title>
+    <link rel="shortcut icon" type="image/png" href="rn.png"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+   crossorigin=""/>
+   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.1.0/dist/MarkerCluster.css">
+   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.1.0/dist/MarkerCluster.Default.css">
+   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+   crossorigin=""></script>
+   <script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.1/leaflet.markercluster.js'></script>
+   <script src="http://code.jquery.com/jquery-2.1.1.js"></script>
+   <script src="https://d3js.org/d3.v7.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   <script src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
+  <style>
+    #mapid {height:100% ;}
+  </style>
+  <link rel="stylesheet" href="plaques.css"/>
+  </head>
+<body>
+  <header>
+    <div id="haut_gauche">
+      <img src="plaques.jpg" alt="Plaque" id="logo" height="45px" style="padding:2px;">
+      <button id="statistiques"></button>
+      <!--<button id="localize"></button>-->
+    </div>
+    
+    <h1 id='titre'>Plaques de Nivellement, Bornes Géodésiques, Clous, Géomètres Sauvages, Cibles, Orgues et autres curiosités...</h1>
+    <div id="boutons">
+      <button id="geodesie">Geodesie de Poche</button>
+      <button id="button_liste_plaques">Liste</button>
+      <button id="Quitter">Quitter</button>
+    </div>
+  </header>
+  <div id="ecran_du_jeu">
+    <div id="mapid"></div>
+  </div>
+  <div id="recherche">
+    <div id="bas_gauche">
+      <div id="choix_affichage">
+        <label>Affichage<select id="Affichage">
+          <option value="type" >Par type</option>
+          <option value="personne" selected>Par personne</option>
+          <option value="cluster">Par zone</option>
+        </select></label>
+      </div>
+      <div id="barre_adresse">
+        <input type="text" placeholder="Adresse" class="form-control form-control-sm" id="inputAdresse" name="adresse">
+        <button id="btn-recherche" type="button" class="btn btn-secondary  btn-shadow">Rechercher</button>
+      </div>
+      <label style="padding-left: 10px;">Afficher les doublons<input type="checkbox" id="btn_doublons", checked>
+    </div>
+    <div id="boutons_milieu_bas">
+      <button id="defi">Défis</button>
+      <button id="Bouton_jouer">Jouer</button>
+      <button id="ajouter_plaque">Ajouter une plaque</button>
+    </div>
+    <div id="div_filtre">
+      <div id="champs_filtre">
+        <input type="text" placeholder="Noms (séparés par |, ! au début les interdit)" class="form-control form-control-sm" id="filtreNom" name="filtreNom">
+        <input type="text" placeholder="Types" class="form-control form-control-sm" id="filtreType" name="filtreType">
+        <input type="text" placeholder="Date (ex : 2021/06/21)" class="form-control form-control-sm" id="filtreDate" name="filtreDate">
+        <input type="text" placeholder="Departement" class="form-control form-control-sm" id="filtreDep" name="filtreDep">
+      </div>
+      <button id="filtrer">Filtrer</button>
+    </div>
+    
+  </div>
+  </body>
+<audio src="Grrr.mp3" id="Grrr"></audio>
+<audio src="../Strategie/audio/Ta Da.mp3" id="tada"></audio>
+
+<script src="plaques.js"></script>
+
+
+</body>
+</html>
