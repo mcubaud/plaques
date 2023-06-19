@@ -647,6 +647,15 @@ input[type=range] {
     100%{height: 50%;}
 }
 
+@keyframes explode_fade{
+    0%{transform: scale(0.01);}
+    10%{transform: scale(0.1) translateY(-20px);}
+    80%{transform: scale(2) translateY(-20px);}
+    100%{background-color: transparent;
+        transform: scale(1.9) translateY(-20px);
+    }
+}
+
 @keyframes partir{
     0%{height: 50%;}
     100%{height: 0%;}

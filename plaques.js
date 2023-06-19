@@ -2071,8 +2071,9 @@ document.getElementById("btn_doublons").onchange=function(){
 }
 
 
-document.getElementById("localize").onclick=function(){
+/*document.getElementById("localize").onclick=function(){
     mymap.locate({setView: true, maxZoom: 16});
+}*/
 
 function onLocationFound(e) {
     var radius = e.accuracy;
@@ -2090,4 +2091,94 @@ function onLocationError(e) {
 }
 
 mymap.on('locationerror', onLocationError);
+
+
+var dynamicStyles = null;
+
+function addAnimation(body) {
+    if (!dynamicStyles) {
+        dynamicStyles = document.createElement('style');
+        dynamicStyles.type = 'text/css';
+        document.head.appendChild(dynamicStyles);
+    } 
+
+    dynamicStyles.sheet.insertRule(body, dynamicStyles.length);
 }
+
+function creer_etoile_feu_artifice(n){
+    var nb_branches = 7 + Math.ceil(10*Math.random());
+    var scale = 5 + Math.ceil(25*Math.random());
+    var x = Math.ceil(0.9 * document.querySelector("body").clientWidth * Math.random());
+    var y = Math.ceil(0.8 * document.querySelector("body").clientHeight * Math.random());
+    var dx = 30*(0.5-Math.random())
+    var etoile = document.createElement("div");
+    etoile = document.querySelector("body").appendChild(etoile);
+    etoile.style = "overflow:hidden"
+    etoile.id="etoile_"+n;
+    var Centre = document.createElement("div");
+    Centre = etoile.appendChild(Centre);
+    var couleur = couleur_aleatoire();
+    addAnimation(`
+        @keyframes explode_fade_${n} { 
+            0%{transform: scale(0.01);}
+            10%{transform: scale(0.1) translateY(-20px) translateX(${dx}px); }
+            75%{transform: scale(2) translateY(-20px) translateX(${dx}px);}
+            100%{background-color: transparent; transform: scale(1.8) translateY(${scale/8 -20}px) translateX(${dx}px);}
+        }
+    `);
+    Centre.style=`background-color:${couleur};width:${scale}px; height:${scale}px; border-radius:${scale/2}px; position:absolute; left:${x}px; top:${y}px; z-index:100000; animation: explode_fade_${n} 1s linear; animation-fill-mode: forwards;`;
+    for(let i=0;i<nb_branches;i++){
+        var angle = i*2*Math.PI/nb_branches;
+        var Pt = document.createElement("div")
+        Pt = etoile.appendChild(Pt)
+        nx = (x  + 2*scale *Math.cos(angle));
+        ny = (scale/4 +y - 2*scale *Math.sin(angle));
+        if((Math.PI-angle)<0){
+            var final_rotate = -angle
+        }else{
+            var final_rotate = -angle +0.5*Math.cos(angle);
+        }
+        addAnimation(`
+            @keyframes explode_fade_${n}_${i} { 
+                0%{transform: scale(0.01) rotateZ(${-angle}rad);}
+                10%{transform: scale(0.1) translateY(-20px) translateX(${dx}px) rotateZ(${-angle}rad);}
+                75%{transform: scale(2) translateY(-20px) translateX(${dx}px) rotateZ(${-angle}rad);}
+                100%{background-color: transparent; transform: scale(1.8) translateY(${scale/8 -20}px) translateX(${dx}px) rotateZ(${final_rotate}rad);}
+            }
+        `);
+        Pt.style=`background-color:${couleur}; width:${2*scale}px; height:${scale/2}px; border-radius:${scale/2}px; position:absolute;  left:${nx}px; top:${ny}px;
+         transform-origin:${scale/2}px; transform:rotateZ(${-angle}rad);z-index:100000; animation: explode_fade_${n}_${i} 1s linear;
+         animation-fill-mode: forwards;
+         `;
+    }
+    setTimeout(x=>document.getElementById("etoile_"+n).remove(), 3000)
+}
+
+
+function feu_artifice(nb_etoiles){
+    for(let n=compte_feux; n<(compte_feux + nb_etoiles);n++){
+        var delay = 500 + Math.ceil(100*Math.random())
+        setTimeout(x=>creer_etoile_feu_artifice(n),delay)
+    }
+    compte_feux =compte_feux + nb_etoiles;
+}
+
+var compte_feux = 0;
+
+function celebrer(nb_plaques, date){
+    var message_div = document.createElement("div")
+    message_div.innerHTML=`
+    <h1 style="animation:deplier 1s ease; z-index: 10000000">${nb_plaques} plaques de nivellement, bornes géodésiques, clous, géomètres sauvages, cibles, orgues et autres curiosités ont été atteintes le ${date} !!!!</h1>`
+    message_div = document.querySelector("body").appendChild(message_div);
+    message_div.style="position:absolute; display:flex; align-items:center; justify-content:center; font-size:3em; z-index:10000; background-color:rgba(0,0,0,0.75); color:red; text-shadow: 4px 4px 6px white; height:"+document.querySelector("body").clientHeight+"px;";
+    if(document.getElementById("tada")){
+        document.getElementById("tada").play();
+    }
+    //document.getElementById("firework").play()
+    feu_artifice(100);
+    setTimeout(x=>message_div.remove(),1500)
+}
+document.getElementById("titre").onclick=function(){
+    celebrer(1500,"26/12/2022");
+}
+
