@@ -165,7 +165,7 @@ function afficher_par_cluster(){
 
 
 
-function markers(array,LayersMarker){
+function markers(array, LayersMarker){
     count=0;
     for(var i=0; i<array.length;i++){
         let obj = array[i];
@@ -489,8 +489,10 @@ function modifier_marker(marker, obj){
         fileInput.onchange = () => {
             var selectedFile = fileInput.files[0];
             console.log(selectedFile);
-            lien = window.URL.createObjectURL(selectedFile);
-            document.getElementById("mod_photo").src=lien;
+            form_Data = new FormData();
+            form_Data.append('file', selectedFile);
+            sauvegarder_image(form_Data);
+            document.getElementById("mod_photo").src="plaques/"+selectedFile.name;
         }
         document.getElementById("save_"+obj.i).onclick = () => {
             ajouter_bouton_envoyer();
@@ -949,10 +951,16 @@ document.getElementById("ajouter_plaque").onclick=function(){
             document.getElementById("mod_photo").style.width=document.getElementsByClassName("leaflet-popup-content-wrapper")[0].clientWidth-5+"px";
             const fileInput = document.getElementById('file_input');
             fileInput.onchange = () => {
-                var selectedFile = fileInput.files[0];
+                selectedFile = fileInput.files[0];
                 console.log(selectedFile);
-                lien = window.URL.createObjectURL(selectedFile);
-                document.getElementById("mod_photo").src=lien;
+                //lien = window.URL.createObjectURL(selectedFile);
+                //lien = URL.createObjectURL(selectedFile);
+                form_Data = new FormData();
+                form_Data.append('file', selectedFile);
+                sauvegarder_image(form_Data);
+                lien = "plaques/"+selectedFile.name;
+                document.getElementById("mod_photo").src="plaques/"+selectedFile.name;
+                
             }
             document.getElementById("confirm_ajout").onclick = () => {
                 ajouter_plaque(event.latlng, lien);
@@ -997,18 +1005,40 @@ function ajouter_bouton_envoyer(){
         exist_bouton_envoyer=true;
         var bouton_envoyer = document.createElement("button")
         bouton_envoyer.id="bouton_envoyer";
-        bouton_envoyer.innerHTML="Envoyer mes modifications à l'administrateur";
+        //bouton_envoyer.innerHTML="Envoyer mes modifications à l'administrateur";
+        bouton_envoyer.innerHTML="Envoyer mes modifications au serveur";
         bouton_envoyer = document.getElementById("boutons_milieu_bas").appendChild(bouton_envoyer);
         bouton_envoyer.onclick=function(){
             var renseignement = document.createElement("div");
-            renseignement.innerHTML="<h2>Envoyer mes modifications à l'administrateur</h2>"
+            //renseignement.innerHTML="<h2>Envoyer mes modifications à l'administrateur</h2>"
+            renseignement.innerHTML="<h2>Envoyer mes modifications au serveur</h2>"
             renseignement.innerHTML+="<input type='text' id='username' placeholder='Votre nom'></input>"
             renseignement.innerHTML+="<textarea id='commentaires' style='width: 70%' placeholder='Commentaires sur vos modifications pour le très grand gourou'></textarea>"
-            renseignement.innerHTML+="<button id='envoyer_admin'>Envoyer à l'administrateur</button>"
+            renseignement.innerHTML+="<label style='padding-left: 10px;'>Je promets que je ne suis pas en train de faire n'importe quoi<input type='checkbox' id='validation_check'>"
+            renseignement.innerHTML+="<button id='envoyer_admin'>Envoyer</button>"
             renseignement.innerHTML+="<button id='annuler_envoi'>Annuler</button>"
             renseignement = document.querySelector("body").appendChild(renseignement)
             renseignement.id = "renseignement";
             document.getElementById('envoyer_admin').onclick=function(){
+                if(document.getElementById("validation_check").checked){
+                    //sauvegarde
+                    var data = 'type=sauvegarder_plaques&data='+JSON.stringify(json_plaques)
+                    console.log(data)
+                    fetch('php/sauvegarde_plaques.php', {
+                        method: 'post',
+                        body: data,
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+                        }).then(r=>{
+                            console.log("Plaque sauvegardée")
+                            renseignement.remove();
+                        })
+
+                }else{
+                    alert("C'est pas bien de faire n'importe quoi !")
+                }
+                /*
                 if(document.getElementById("username").value){
                     alert("Cher ou chère "+document.getElementById('username').value+", cette fonctionalité n'est malheureusement pas encore disponible ! Toutes nos excuses ! Vous pouvez néanmoins nous envoyer un courriel de réclamation. Si vous avez ajouté des photos, n'oubliez pas de les mettre en pièce-jointe.")
                   }else{
@@ -1022,6 +1052,7 @@ function ajouter_bouton_envoyer(){
                 + encodeURIComponent("Modifications de Plaques de Nivellement, Bornes Géodésiques, Clous, Géomètres Sauvages, Cibles, Orgues et autres curiosités...")
                 + "&body=" + encodeURIComponent(yourMessage));
                 renseignement.remove()
+                */
             }
             document.getElementById("annuler_envoi").onclick=function(){
                 renseignement.remove();
@@ -2071,9 +2102,9 @@ document.getElementById("btn_doublons").onchange=function(){
 }
 
 
-/*document.getElementById("localize").onclick=function(){
+document.getElementById("localize").onclick=function(){
     mymap.locate({setView: true, maxZoom: 16});
-}*/
+}
 
 function onLocationFound(e) {
     var radius = e.accuracy;
@@ -2182,3 +2213,32 @@ document.getElementById("titre").onclick=function(){
     celebrer(1500,"26/12/2022");
 }
 
+function sauvegarder_image(form_Data){
+    fetch('php/sauvegarde_image.php', {
+        method: 'POST',
+        body: form_Data,
+      })
+        .then(response => response.text())
+        .then(result => {
+          // Handle the server response here
+          console.log(result);
+        })
+        .catch(error => {
+          // Handle errors here
+          console.error(error);
+        });
+    /*    
+    data = 'lien=' + lien+'&name=' + name;
+    fetch('php/sauvegarde_image.php', {
+        method: 'post',
+        body: data,
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+        }).then(r=>{
+            console.log(r)
+            console.log("Image sauvegardée de "+lien+" à "+name);
+            document.getElementById("mod_photo").src="plaques/"+name;
+        });
+    */
+}
